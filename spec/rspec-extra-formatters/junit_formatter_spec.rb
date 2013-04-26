@@ -151,11 +151,43 @@ describe JUnitFormatter do
   <testcase classname="lib/foobar-s.rb" name="foobar-success" time="0.1" />
   <testcase classname="lib/foobar-f.rb" name="foobar-failure" time="0.1">
     <failure message="failure" type="failure">
-<![CDATA[ foobar\nfoo\nbar ]]>
+foobar\nfoo\nbar
     </failure>
   </testcase>
   <testcase classname="lib/foobar-s.rb" name="foobar-pending" time="0.1">
     <skipped/>
+  </testcase>
+</testsuite>
+      EOF
+    end
+
+    it "should escape invalid chars in failure traces" do
+      strace = mock("stacktrace")
+      strace.should_receive(:message).and_return("foobar")
+      strace.should_receive(:backtrace).and_return(["\x1b\x08<>&©"])
+   
+      example0 = mock("example-0")
+      example0.should_receive(:metadata).exactly(3).times.and_return({ :full_description => "foobar-failure" \
+                                                                     , :file_path        => "lib/foobar-f.rb" \
+                                                                     , :execution_result => { :exception_encountered => strace \
+                                                                                            , :run_time              => 0.1 \
+                                                                                            }
+                                                                     })
+   
+      output = StringIO.new
+      f = JUnitFormatter.new(output)
+      f.example_failed(example0)
+      f.dump_summary("0.1", 1, 1, 0)
+
+      output.string.should == <<-EOF
+<?xml version="1.0" encoding="utf-8" ?>
+<testsuite errors="0" failures="1" skipped="0" tests="1" time="0.1" timestamp="#{@now.iso8601}">
+  <properties />
+  <testcase classname="lib/foobar-f.rb" name="foobar-failure" time="0.1">
+    <failure message="failure" type="failure">
+foobar
+\\x1b\\x08&lt;&gt;&amp;&#169;
+    </failure>
   </testcase>
 </testsuite>
       EOF

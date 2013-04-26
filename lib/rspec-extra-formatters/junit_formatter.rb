@@ -28,6 +28,7 @@
 
 require "time"
 require "rspec/core/formatters/base_formatter"
+require "xchar"
 
 class JUnitFormatter < RSpec::Core::Formatters::BaseFormatter
 
@@ -83,7 +84,10 @@ class JUnitFormatter < RSpec::Core::Formatters::BaseFormatter
       runtime     = md[:execution_result][:run_time]
       output.puts("  <testcase classname=\"#{file_path}\" name=\"#{description}\" time=\"#{runtime}\">")
       output.puts("    <failure message=\"failure\" type=\"failure\">")
-      output.puts("<![CDATA[ #{read_failure(t)} ]]>")
+      # CDATA is not appropriate here, because we don't know what the content will be
+      # CDATA must contain only encoding-valid chars and cannot include a nested CDATA
+      # output.puts("<![CDATA[ #{read_failure(t)} ]]>")
+      output.puts(read_failure(t).to_s.to_xs)
       output.puts("    </failure>")
       output.puts("  </testcase>")
     end
@@ -101,8 +105,8 @@ class JUnitFormatter < RSpec::Core::Formatters::BaseFormatter
 
   def _xml_escape(x)
     x.gsub("&", "&amp;").
-      gsub("\"", "&quot;").
-      gsub(">", "&gt;").
-      gsub("<", "&lt;")
+     gsub("\"", "&quot;").
+     gsub(">", "&gt;").
+     gsub("<", "&lt;")
   end
 end
