@@ -73,7 +73,7 @@ describe JUnitFormatter do
   describe "read_failure" do
 
     it "should ignore if there is no exception" do
-      example = mock("example")
+      example = double("example")
       example.should_receive(:metadata).exactly(2).times.and_return({:execution_result => { :exception_encountered => nil \
                                                                                           , :exception => nil \
                                                                                           }})
@@ -82,11 +82,11 @@ describe JUnitFormatter do
     end
 
     it "should attempt to read exception if exception encountered is nil" do
-      strace = mock("stacktrace")
+      strace = double("stacktrace")
       strace.should_receive(:message).and_return("foobar")
       strace.should_receive(:backtrace).and_return(["foo","bar"])
 
-      example = mock("example")
+      example = double("example")
       example.should_receive(:metadata).exactly(3).times.and_return({:execution_result => { :exception_encountered => nil \
                                                                                           , :exception => strace \
                                                                                           }})
@@ -96,11 +96,11 @@ describe JUnitFormatter do
     end
 
     it "should read message and backtrace from the example" do
-      strace = mock("stacktrace")
+      strace = double("stacktrace")
       strace.should_receive(:message).and_return("foobar")
       strace.should_receive(:backtrace).and_return(["foo","bar"])
 
-      example    = mock("example")
+      example    = double("example")
       example.should_receive(:metadata).exactly(2).times.and_return({:execution_result => {:exception_encountered => strace}})
 
       f = JUnitFormatter.new(StringIO.new)
@@ -112,17 +112,17 @@ describe JUnitFormatter do
   describe "dump_summary" do
    
     it "should print the junit xml" do
-      strace = mock("stacktrace")
+      strace = double("stacktrace")
       strace.should_receive(:message).and_return("foobar")
       strace.should_receive(:backtrace).and_return(["foo","bar"])
    
-      example0 = mock("example-0")
+      example0 = double("example-0")
       example0.should_receive(:metadata).and_return({ :full_description => "foobar-success" \
                                                     , :file_path        => "lib/foobar-s.rb" \
                                                     , :execution_result => { :run_time => 0.1 } \
                                                     })
    
-      example1 = mock("example-1")
+      example1 = double("example-1")
       example1.should_receive(:metadata).exactly(3).times.and_return({ :full_description => "foobar-failure" \
                                                                      , :file_path        => "lib/foobar-f.rb" \
                                                                      , :execution_result => { :exception_encountered => strace \
@@ -130,7 +130,7 @@ describe JUnitFormatter do
                                                                                             }
                                                                      })
 
-      example2 = mock("example-2")
+      example2 = double("example-2")
       example2.should_receive(:metadata).and_return({ :full_description => "foobar-pending" \
                                                    , :file_path        => "lib/foobar-s.rb" \
                                                    , :execution_result => { :run_time => 0.1 } \
@@ -162,11 +162,11 @@ foobar\nfoo\nbar
     end
 
     it "should escape invalid chars in failure traces" do
-      strace = mock("stacktrace")
+      strace = double("stacktrace")
       strace.should_receive(:message).and_return("foobar")
       strace.should_receive(:backtrace).and_return(["\x1b\x08<>&©"])
    
-      example0 = mock("example-0")
+      example0 = double("example-0")
       example0.should_receive(:metadata).exactly(3).times.and_return({ :full_description => "foobar-failure" \
                                                                      , :file_path        => "lib/foobar-f.rb" \
                                                                      , :execution_result => { :exception_encountered => strace \
@@ -194,7 +194,7 @@ foobar
     end
 
     it "should escape characteres <,>,&,\" before building xml" do
-      example0 = mock("example-0")
+      example0 = double("example-0")
       example0.should_receive(:metadata).and_return({ :full_description => "foobar-success >>> &\"& <<<" \
                                                     , :file_path        => "lib/>foobar-s.rb" \
                                                     , :execution_result => { :run_time => 0.1 } \

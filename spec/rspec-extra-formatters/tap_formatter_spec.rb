@@ -38,7 +38,7 @@ describe TapFormatter do
   describe "example_passed" do
 
     it "should increment the counter and use the full_description attribute" do
-      example = mock("example")
+      example = double("example")
       example.should_receive(:metadata).and_return({:full_description => "foobar"})
 
       output = StringIO.new
@@ -54,7 +54,7 @@ describe TapFormatter do
   describe "example_failed" do
 
     it "should increment the counter and use the full_description attribute" do
-      example = mock("example")
+      example = double("example")
       example.stub(:exception) { "exception message" }
       example.should_receive(:metadata).and_return({:full_description => "foobar"})
 
@@ -75,7 +75,7 @@ not ok 1 - foobar
   describe "example_pending" do
 
     it "should do the same as example_failed with SKIP comment" do
-      example = mock("example")
+      example = double("example")
       example.stub(:exception) { "exception message" }
       example.should_receive(:metadata).and_return({:full_description => "foobar"})
       
@@ -92,7 +92,7 @@ not ok 1 - foobar
   describe "dump_summary" do
 
     it "should print the number of tests if there were tests" do
-      example = mock("example")
+      example = double("example")
       example.stub(:exception) { "exception message" }
       example.should_receive(:metadata).and_return({:full_description => "foobar"})
       example.should_receive(:metadata).and_return({:full_description => "foobar"})
